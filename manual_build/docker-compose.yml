@@ -6,6 +6,7 @@ services:
     #cap_add:
       #- SYS_PTRACE
     container_name: qbittorrent-nox
+    restart: unless-stopped
     environment:
       - PAGID=120
       - PGID=1001
