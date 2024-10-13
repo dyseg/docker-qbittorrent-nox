@@ -79,10 +79,11 @@ RUN \
     git clone \
       --depth 1 \
       --recurse-submodules \
-      https://github.com/qbittorrent/qBittorrent.git && \
+      https://github.com/dyseg/qBittorrent.git && \
+      - b webui \
     cd qBittorrent ; \
   else \
-    wget "https://github.com/qbittorrent/qBittorrent/archive/refs/tags/release-${QBT_VERSION}.tar.gz" && \
+    wget "https://github.com/dyseg/qBittorrent/archive/refs/tags/release-${QBT_VERSION}.tar.gz" && \
     tar -xf "release-${QBT_VERSION}.tar.gz" && \
     cd "qBittorrent-release-${QBT_VERSION}" ; \
   fi && \

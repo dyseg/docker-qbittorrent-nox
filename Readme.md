@@ -1,6 +1,6 @@
 # qBittorrent-nox Docker Image [![GitHub Actions CI Status](https://github.com/qbittorrent/docker-qbittorrent-nox/actions/workflows/release.yaml/badge.svg)](https://github.com/qbittorrent/docker-qbittorrent-nox/actions)
 
-Repository on Docker Hub: https://hub.docker.com/r/qbittorrentofficial/qbittorrent-nox \
+Repository on Docker Hub: https://hub.docker.com/r/dyseg/qbittorrent-nox \
 Repository on GitHub: https://github.com/qbittorrent/docker-qbittorrent-nox
 
 ## Supported architectures
@@ -51,7 +51,7 @@ https://github.com/qbittorrent/qBittorrent/issues
       the legal notice [here](https://github.com/qbittorrent/qBittorrent/blob/56667e717b82c79433ecb8a5ff6cc2d7b315d773/src/app/main.cpp#L320-L323).
     * `QBT_VERSION` \
       This environment variable specifies the version of qBittorrent-nox to use. \
-      For example, `4.4.5-1` is a valid entry. You can find all tagged versions [here](https://hub.docker.com/r/qbittorrentofficial/qbittorrent-nox/tags). \
+      For example, `4.4.5-1` is a valid entry. You can find all tagged versions [here](https://hub.docker.com/r/dyseg/qbittorrent-nox/tags). \
       You can put `latest` to use the latest stable release of qBittorrent. \
       If you are up to test the bleeding-edge version, you can put `alpha` to get the weekly build.
     * `QBT_WEBUI_PORT` \
@@ -92,7 +92,7 @@ https://github.com/qbittorrent/qBittorrent/issues
         -p 6881:6881/udp \
         -v "$QBT_CONFIG_PATH":/config \
         -v "$QBT_DOWNLOADS_PATH":/downloads \
-        qbittorrentofficial/qbittorrent-nox:${QBT_VERSION}
+        dyseg/qbittorrent-nox:${QBT_VERSION}
       ```
 
     * If using Docker Compose:
@@ -118,7 +118,7 @@ https://github.com/qbittorrent/qBittorrent/issues
         environment variable `UMASK`. By default it uses the default from Alpine Linux.
       * You can list the compile-time Software Bill of Materials (sbom) with the following command:
         ```shell
-        docker run --entrypoint /bin/cat --rm qbittorrentofficial/qbittorrent-nox:latest /sbom.txt
+        docker run --entrypoint /bin/cat --rm dyseg/qbittorrent-nox:latest /sbom.txt
         ```
 
     * Then you can login to qBittorrent-nox at: `http://<your_docker_host_address>:8080`

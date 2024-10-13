@@ -37,7 +37,7 @@ It is also recommended to install Docker Compose as it can significantly ease th
 * `QBT_LEGAL_NOTICE` \
   This environment variable defines whether you had read the legal notice of qBittorrent. \
   **Put `confirm` only if you had read the legal notice.** You can find
-  the legal notice [here](https://github.com/qbittorrent/qBittorrent/blob/56667e717b82c79433ecb8a5ff6cc2d7b315d773/src/app/main.cpp#L320-L323).
+  the legal notice [here](https://github.com/dyseg/qBittorrent/blob/56667e717b82c79433ecb8a5ff6cc2d7b315d773/src/app/main.cpp#L320-L323).
 * `QBT_VERSION` \
   This environment variable specifies the version of qBittorrent-nox to be built. \
   For example, `4.4.0` is a valid entry. You can find all tagged versions [here](https://github.com/qbittorrent/qBittorrent/tags). \
@@ -105,7 +105,7 @@ There are some paths involved:
     environment variable `UMASK`. By default it uses the default from Alpine Linux.
   * You can list the compile-time Software Bill of Materials (sbom) with the following command:
     ```shell
-    docker run --entrypoint /bin/cat --rm qbittorrentofficial/qbittorrent-nox:latest /sbom.txt
+    docker run --entrypoint /bin/cat --rm dyseg/qbittorrent-nox:latest /sbom.txt
     ```
 
 * Then you can login to qBittorrent-nox at: `http://<your_docker_host_address>:8080`

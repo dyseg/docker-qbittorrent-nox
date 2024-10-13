@@ -13,7 +13,7 @@ services:
       - QBT_WEBUI_PORT=${QBT_WEBUI_PORT}
       #- TZ=UTC
       #- UMASK=022
-    image: qbittorrentofficial/qbittorrent-nox:${QBT_VERSION}
+    image: dyseg/qbittorrent-nox:${QBT_VERSION}
     ports:
       # for bittorrent traffic
       - 6881:6881/tcp

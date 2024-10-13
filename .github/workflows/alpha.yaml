@@ -1,8 +1,6 @@
 name: Release - Alpha
 
 on:
-  schedule:
-    - cron: '0 0 * * 0'
   workflow_dispatch:  # allow trigger it manually
 
 permissions:
@@ -44,32 +42,33 @@ jobs:
             QBT_VERSION=devel
             LIBBT_VERSION=RC_2_0
             LIBBT_CMAKE_FLAGS=-Ddeprecated-functions=ON
+            BRANCH=webui
           labels: |
-            org.opencontainers.image.authors=https://github.com/qbittorrent/qBittorrent/graphs/contributors
+            org.opencontainers.image.authors=https://github.com/dyseg/qBittorrent/graphs/contributors
             org.opencontainers.image.base.name=docker.io/alpine:latest
             org.opencontainers.image.description=An advanced BitTorrent client programmed in C++, based on Qt toolkit and libtorrent-rasterbar
-            org.opencontainers.image.documentation=https://github.com/qbittorrent/docker-qbittorrent-nox#qbittorrent-nox-docker-image-
+            org.opencontainers.image.documentation=https://github.com/dyseg/docker-qbittorrent-nox#qbittorrent-nox-docker-image-
             org.opencontainers.image.created=${{ steps.set-variables.outputs.DATE }}
             org.opencontainers.image.licenses=GPL-3.0+
             org.opencontainers.image.ref.name=alpha-devel
             org.opencontainers.image.revision=${{ github.sha }}
-            org.opencontainers.image.source=https://github.com/qbittorrent/docker-qbittorrent-nox
+            org.opencontainers.image.source=https://github.com/dyseg/docker-qbittorrent-nox
             org.opencontainers.image.title=qbittorrent-nox docker image
-            org.opencontainers.image.url=https://github.com/qbittorrent/docker-qbittorrent-nox
+            org.opencontainers.image.url=https://github.com/dyseg/docker-qbittorrent-nox
             org.opencontainers.image.vendor=qBittorrent
-            org.opencontainers.image.version=master
+            org.opencontainers.image.version=webui
           load: true
           platforms: ${{ matrix.platform }}
           tags: |
-            qbittorrentofficial/qbittorrent-nox:alpha
-            ghcr.io/qbittorrent/docker-qbittorrent-nox:alpha
+            dyseg/qbittorrent-nox:alpha
+            ghcr.io/dyseg/docker-qbittorrent-nox:alpha
 
       - name: Test run
         run: |
           docker run \
             --entrypoint "/usr/bin/qbittorrent-nox" \
             --platform ${{ matrix.platform }} \
-            qbittorrentofficial/qbittorrent-nox:alpha \
+            dyseg/qbittorrent-nox:alpha \
             --version
 
       # To run the image locally:
@@ -80,7 +79,7 @@ jobs:
         run: |
           docker save \
             --output qbittorrent-nox_alpha_${{ steps.set-variables.outputs.PLATFORM_NAME }} \
-            qbittorrentofficial/qbittorrent-nox:alpha
+            dyseg/qbittorrent-nox:alpha
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -123,5 +122,5 @@ jobs:
 
       - name: Upload to registries
         run: |
-          docker push qbittorrentofficial/qbittorrent-nox:alpha
-          docker push ghcr.io/qbittorrent/docker-qbittorrent-nox:alpha
+          docker push dyseg/qbittorrent-nox:alpha
+          docker push ghcr.io/dyseg/docker-qbittorrent-nox:alpha
