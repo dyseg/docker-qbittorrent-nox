@@ -10,6 +10,7 @@ Repository on GitHub: https://github.com/qbittorrent/docker-qbittorrent-nox
 * linux/arm/v6
 * linux/arm/v7
 * linux/arm64/v8
+* linux/riscv64
 
 ## Reporting bugs
 
@@ -35,6 +36,9 @@ https://github.com/qbittorrent/qBittorrent/issues
 
 2. Edit Docker environment file
 
+    If you are using Docker Stack, refer to [docker-stack.yml](https://github.com/qbittorrent/docker-qbittorrent-nox/blob/main/docker-stack.yml) file as an example. \
+    It is an almost ready-to-use configuration yet a few variables are required to be filled in. Make sure you read the following steps as they largely share the same concept.
+
     If you are not using Docker Compose you can skip editing the environment file.
     However the variables presented below is crucial in later steps, make sure you understand them.
 
@@ -44,14 +48,14 @@ https://github.com/qbittorrent/qBittorrent/issues
 
     #### Environment variables
 
-    * `QBT_EULA` \
-      This environment variable defines whether you accept the end-user license agreement (EULA) of qBittorrent. \
-      **Put `accept` only if you understand and accepted the EULA.** You can find
-      the EULA [here](https://github.com/qbittorrent/qBittorrent/blob/56667e717b82c79433ecb8a5ff6cc2d7b315d773/src/app/main.cpp#L320-L323).
+    * `QBT_LEGAL_NOTICE` \
+      This environment variable defines whether you had read the legal notice of qBittorrent. \
+      **Put `confirm` only if you had read the legal notice.** You can find
+      the legal notice [here](https://github.com/qbittorrent/qBittorrent/blob/56667e717b82c79433ecb8a5ff6cc2d7b315d773/src/app/main.cpp#L320-L323).
     * `QBT_VERSION` \
       This environment variable specifies the version of qBittorrent-nox to use. \
       For example, `4.4.5-1` is a valid entry. You can find all tagged versions [here](https://hub.docker.com/r/qbittorrentofficial/qbittorrent-nox/tags). \
-      Or you can put `latest` to use the latest stable release of qBittorrent. \
+      You can put `latest` to use the latest stable release of qBittorrent. \
       If you are up to test the bleeding-edge version, you can put `alpha` to get the weekly build.
     * `QBT_WEBUI_PORT` \
       This environment variable sets the port number which qBittorrent WebUI will be binded to.
@@ -72,7 +76,7 @@ https://github.com/qbittorrent/qBittorrent/issues
     * If using Docker (not Docker Compose), edit the variables and run:
       ```shell
       export \
-        QBT_EULA=<put_accept_here> \
+        QBT_LEGAL_NOTICE=<put_confirm_here> \
         QBT_VERSION=latest \
         QBT_WEBUI_PORT=8080 \
         QBT_CONFIG_PATH="<your_path>/config" \
@@ -84,7 +88,7 @@ https://github.com/qbittorrent/qBittorrent/issues
         --rm \
         --stop-timeout 1800 \
         --tmpfs /tmp \
-        -e QBT_EULA \
+        -e QBT_LEGAL_NOTICE \
         -e QBT_WEBUI_PORT \
         -p "$QBT_WEBUI_PORT":"$QBT_WEBUI_PORT"/tcp \
         -p 6881:6881/tcp \
