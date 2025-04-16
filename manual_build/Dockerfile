@@ -54,17 +54,14 @@ ENV CFLAGS="-pipe -fstack-clash-protection -fstack-protector-strong -fno-plt -U_
 
 # build libtorrent
 RUN \
-  if [ "${LIBBT_VERSION}" = "devel" ]; then \
-    git clone \
-      --depth 1 \
-      --recurse-submodules \
-      https://github.com/arvidn/libtorrent.git && \
-    cd libtorrent ; \
-  else \
-    wget "https://github.com/arvidn/libtorrent/releases/download/v${LIBBT_VERSION}/libtorrent-rasterbar-${LIBBT_VERSION}.tar.gz" && \
-    tar -xf "libtorrent-rasterbar-${LIBBT_VERSION}.tar.gz" && \
-    cd "libtorrent-rasterbar-${LIBBT_VERSION}" ; \
-  fi && \
+  git clone \
+    --recurse-submodules \
+    --depth 1 \
+    -b experimental \
+    #-b RC_1_2 \
+    #https://github.com/HanabishiRecca/libtorrent.git && \
+    https://github.com/dyseg/libtorrent.git && \
+  cd libtorrent ;\
   cmake \
     -B build \
     -G Ninja \
@@ -83,7 +80,8 @@ RUN \
     git clone \
       --depth 1 \
       --recurse-submodules \
-      https://github.com/qbittorrent/qBittorrent.git && \
+      -b webui-wip \
+      https://github.com/dyseg/qBittorrent.git && \
     cd qBittorrent ; \
   else \
     wget "https://github.com/qbittorrent/qBittorrent/archive/refs/tags/release-${QBT_VERSION}.tar.gz" && \
