@@ -27,7 +27,7 @@ ARG QBT_VERSION \
     BOOST_VERSION_MAJOR="1" \
     BOOST_VERSION_MINOR="86" \
     BOOST_VERSION_PATCH="0" \
-    LIBBT_VERSION="experimental" \
+    LIBBT_VERSION="RC_2_0" \
     LIBBT_CMAKE_FLAGS=""
 
 # check environment variables
@@ -76,7 +76,7 @@ RUN \
     --branch "${LIBBT_VERSION}" \
     --depth 1 \
     --recurse-submodules \
-    https://github.com/dyseg/libtorrent.git && \
+    https://github.com/arvidn/libtorrent.git && \
   cd libtorrent && \
   cmake \
     -B build \
