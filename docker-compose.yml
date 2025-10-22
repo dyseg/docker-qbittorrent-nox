@@ -3,6 +3,9 @@ services:
     # for debugging
     #cap_add:
       #- SYS_PTRACE
+    # additional arguments to `qbittorrent-nox`
+    #command:
+      #- --help
     container_name: qbittorrent-nox
     environment:
       #- PAGID=10000
@@ -10,14 +13,15 @@ services:
       #- PUID=1000
       - QBT_LEGAL_NOTICE=${QBT_LEGAL_NOTICE}
       - QBT_VERSION=${QBT_VERSION}
+      - QBT_TORRENTING_PORT=${QBT_TORRENTING_PORT}
       - QBT_WEBUI_PORT=${QBT_WEBUI_PORT}
       #- TZ=UTC
       #- UMASK=022
     image: qbittorrentofficial/qbittorrent-nox:${QBT_VERSION}
     ports:
       # for bittorrent traffic
-      - 6881:6881/tcp
-      - 6881:6881/udp
+      - ${QBT_TORRENTING_PORT}:${QBT_TORRENTING_PORT}/tcp
+      - ${QBT_TORRENTING_PORT}:${QBT_TORRENTING_PORT}/udp
       # for WebUI
       - ${QBT_WEBUI_PORT}:${QBT_WEBUI_PORT}/tcp
     read_only: true

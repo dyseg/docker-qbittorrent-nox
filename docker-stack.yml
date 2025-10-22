@@ -5,11 +5,15 @@ services:
     # for debugging
     #cap_add:
       #- SYS_PTRACE
+    # additional arguments to `qbittorrent-nox`
+    #command:
+      #- --help
     environment:
       #- PAGID=10000
       #- PGID=1000
       #- PUID=1000
       - QBT_LEGAL_NOTICE=
+      - QBT_TORRENTING_PORT=6881
       - QBT_WEBUI_PORT=8080
       #- TZ=UTC
       #- UMASK=022

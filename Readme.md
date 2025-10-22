@@ -57,6 +57,9 @@ https://github.com/qbittorrent/qBittorrent/issues
       For example, `4.4.5-1` is a valid entry. You can find all tagged versions [here](https://hub.docker.com/r/qbittorrentofficial/qbittorrent-nox/tags). \
       You can put `latest` to use the latest stable release of qBittorrent. \
       If you are up to test the bleeding-edge version, you can put `alpha` to get the weekly build.
+    * `QBT_TORRENTING_PORT` \
+      This environment variable sets the port number which torrenting traffic will be binded to.
+      Defaults to port `6881` if value is not set.
     * `QBT_WEBUI_PORT` \
       This environment variable sets the port number which qBittorrent WebUI will be binded to.
       Defaults to port `8080` if value is not set.
@@ -78,6 +81,7 @@ https://github.com/qbittorrent/qBittorrent/issues
       export \
         QBT_LEGAL_NOTICE=<put_confirm_here> \
         QBT_VERSION=latest \
+        QBT_TORRENTING_PORT=6881 \
         QBT_WEBUI_PORT=8080 \
         QBT_CONFIG_PATH="<your_path>/config" \
         QBT_DOWNLOADS_PATH="<your_path>/downloads"
@@ -89,10 +93,11 @@ https://github.com/qbittorrent/qBittorrent/issues
         --stop-timeout 1800 \
         --tmpfs /tmp \
         -e QBT_LEGAL_NOTICE \
+        -e QBT_TORRENTING_PORT \
         -e QBT_WEBUI_PORT \
+        -p "$QBT_TORRENTING_PORT":"$QBT_TORRENTING_PORT"/tcp \
+        -p "$QBT_TORRENTING_PORT":"$QBT_TORRENTING_PORT"/udp \
         -p "$QBT_WEBUI_PORT":"$QBT_WEBUI_PORT"/tcp \
-        -p 6881:6881/tcp \
-        -p 6881:6881/udp \
         -v "$QBT_CONFIG_PATH":/config \
         -v "$QBT_DOWNLOADS_PATH":/downloads \
         qbittorrentofficial/qbittorrent-nox:${QBT_VERSION}
@@ -106,6 +111,8 @@ https://github.com/qbittorrent/qBittorrent/issues
     * A few notes:
       * Alternatively, you can use `ghcr.io/qbittorrent/docker-qbittorrent-nox:${QBT_VERSION}`
         for the image path.
+      * You can pass command-line arguments to `qbittorrent-nox` by appending them to the end of `docker run ...` command.
+        If using Docker Compose, modify the `command:` array in docker-compose.yml.
       * By default the timezone in the container uses the default of Alpine Linux (which is most likely `UTC`).
         You can set the environment variable `TZ` to your preferred value.
       * You can change the User ID (UID) and Group ID (GID) of the `qbittorrent-nox` process by setting
@@ -151,7 +158,7 @@ Refer to [manual_build](https://github.com/qbittorrent/docker-qbittorrent-nox/tr
 
 ## Debugging
 
-To attach gdb to the running qbittorent-nox process, follow the steps below:
+To attach gdb to the running qbittorrent-nox process, follow the steps below:
 
 1. Before you start the container
    * Remove `--read-only` as it will need additional packages within the container. \
