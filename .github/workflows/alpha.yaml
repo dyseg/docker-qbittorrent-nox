@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
 
@@ -45,6 +45,9 @@ jobs:
         with:
           build-args: |
             QBT_VERSION=devel
+            BOOST_VERSION_MAJOR=1
+            BOOST_VERSION_MINOR=90
+            BOOST_VERSION_PATCH=0
             LIBBT_VERSION=RC_2_0
             LIBBT_CMAKE_FLAGS=-Ddeprecated-functions=ON
           labels: |
@@ -86,7 +89,7 @@ jobs:
             qbittorrentofficial/qbittorrent-nox:alpha
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: qbittorrent-nox_alpha_${{ steps.set-variables.outputs.PLATFORM_NAME }}
           path: qbittorrent-nox_alpha_${{ steps.set-variables.outputs.PLATFORM_NAME }}

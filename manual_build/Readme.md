@@ -4,11 +4,11 @@ This Dockerfile allows you to build a Docker Image containing qBittorrent-nox
 
 ## Prerequisites
 
-In order to build/run this image you'll need Docker installed: https://docs.docker.com/get-docker/
+In order to build/run this image you will need Docker installed: https://docs.docker.com/get-docker/
 
 If you don't need the GUI, you can just install Docker Engine: https://docs.docker.com/engine/install/
 
-It is also recommended to install Docker Compose as it can significantly ease the process: https://docs.docker.com/compose/install/
+It is also recommended to install Docker Compose as it can simplify the process significantly: https://docs.docker.com/compose/install/
 
 ## Building Docker Image
 
@@ -35,18 +35,18 @@ It is also recommended to install Docker Compose as it can significantly ease th
 #### Environment variables
 
 * `QBT_LEGAL_NOTICE` \
-  This environment variable defines whether you had read the legal notice of qBittorrent. \
-  **Put `confirm` only if you had read the legal notice.** You can find
+  This environment variable defines whether you have read the legal notice of qBittorrent. \
+  **Put `confirm` only if you have read the legal notice.** You can find
   the legal notice [here](https://github.com/qbittorrent/qBittorrent/blob/56667e717b82c79433ecb8a5ff6cc2d7b315d773/src/app/main.cpp#L320-L323).
 * `QBT_VERSION` \
   This environment variable specifies the version of qBittorrent-nox to be built. \
   For example, `4.4.0` is a valid entry. You can find all tagged versions [here](https://github.com/qbittorrent/qBittorrent/tags). \
   You can put `devel` to build the latest development version.
 * `QBT_TORRENTING_PORT` \
-  This environment variable sets the port number which torrenting traffic will be binded to.
+  This environment variable defines the port number used for torrenting traffic.
   Defaults to port `6881` if value is not set.
 * `QBT_WEBUI_PORT` \
-  This environment variable sets the port number which qBittorrent WebUI will be binded to.
+  This environment variable defines the port number used for qBittorrent WebUI.
   Defaults to port `8080` if value is not set.
 
 #### Volumes
@@ -54,10 +54,10 @@ It is also recommended to install Docker Compose as it can significantly ease th
 There are some paths involved:
 * `<your_path>/config` \
   Full path to a folder on your host machine which will store qBittorrent configurations.
-  Using relative path won't work.
+  Using a relative path will not work.
 * `<your_path>/downloads` \
   Full path to a folder on your host machine which will store the files downloaded by qBittorrent.
-  Using relative path won't work.
+  Using a relative path will not work.
 
 ## Running container
 
@@ -102,7 +102,7 @@ There are some paths involved:
   * You can change the User ID (UID) and Group ID (GID) of the `qbittorrent-nox` process by setting
     environment variables `PUID` and `PGID` respectively. By default they are both set to `1000`. \
     Note that you will need to remove `--read-only` flag (when using Docker) or set
-    `read_only: false` (when using Docker Compose) as they are incompatible with it.
+    `read_only: false` (when using Docker Compose) as these settings are incompatible with each other.
   * You can set additional group ID (AGID) of the `qbittorrent-nox` process by setting the
     environment variable `PAGID`. For example: `10000,10001`, this will set the process to be in
     two (secondary) groups `10000` and `10001`. By default there is no additional group. \

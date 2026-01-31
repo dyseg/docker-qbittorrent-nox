@@ -24,23 +24,23 @@ https://github.com/qbittorrent/qBittorrent/issues
 
 0. Prerequisites
 
-    In order to run this image you'll need Docker installed: https://docs.docker.com/get-docker/
+    In order to run this image you will need Docker installed: https://docs.docker.com/get-docker/
 
     If you don't need the GUI, you can just install Docker Engine: https://docs.docker.com/engine/install/
 
-    It is also recommended to install Docker Compose as it can significantly ease the process: https://docs.docker.com/compose/install/
+    It is also recommended to install Docker Compose as it can simplify the process significantly: https://docs.docker.com/compose/install/
 
 1. Download this repository
 
-    You can either `git clone` this repository or download an .zip of it: https://github.com/qbittorrent/docker-qbittorrent-nox/archive/refs/heads/main.zip
+    You can either `git clone` this repository or download a .zip of it: https://github.com/qbittorrent/docker-qbittorrent-nox/archive/refs/heads/main.zip
 
 2. Edit Docker environment file
 
     If you are using Docker Stack, refer to [docker-stack.yml](https://github.com/qbittorrent/docker-qbittorrent-nox/blob/main/docker-stack.yml) file as an example. \
-    It is an almost ready-to-use configuration yet a few variables are required to be filled in. Make sure you read the following steps as they largely share the same concept.
+    It is an almost ready-to-use configuration, though a few variables need to be filled in. Make sure you read the following steps as they largely share the same concept.
 
     If you are not using Docker Compose you can skip editing the environment file.
-    However the variables presented below is crucial in later steps, make sure you understand them.
+    However, the variables presented below are crucial for later steps, make sure you understand them.
 
     Find and open the `.env` file in the repository you cloned (or the .zip archive you downloaded). \
     There are a few variables that you must take care of before you can run the image. \
@@ -49,19 +49,20 @@ https://github.com/qbittorrent/qBittorrent/issues
     #### Environment variables
 
     * `QBT_LEGAL_NOTICE` \
-      This environment variable defines whether you had read the legal notice of qBittorrent. \
-      **Put `confirm` only if you had read the legal notice.** You can find
+      This environment variable defines whether you have read the legal notice of qBittorrent. \
+      **Put `confirm` only if you have read the legal notice.** You can find
       the legal notice [here](https://github.com/qbittorrent/qBittorrent/blob/56667e717b82c79433ecb8a5ff6cc2d7b315d773/src/app/main.cpp#L320-L323).
     * `QBT_VERSION` \
       This environment variable specifies the version of qBittorrent-nox to use. \
       For example, `4.4.5-1` is a valid entry. You can find all tagged versions [here](https://hub.docker.com/r/qbittorrentofficial/qbittorrent-nox/tags). \
       You can put `latest` to use the latest stable release of qBittorrent. \
-      If you are up to test the bleeding-edge version, you can put `alpha` to get the weekly build.
+      If you are looking to test the bleeding-edge version, you can put `alpha` to get the weekly build. \
+      A `lt2` variation is available which uses libtorrent v2.x. However, users have reported memory/performance [issues](https://github.com/arvidn/libtorrent/issues/6667). Use at your own risk!
     * `QBT_TORRENTING_PORT` \
-      This environment variable sets the port number which torrenting traffic will be binded to.
+      This environment variable defines the port number used for torrenting traffic.
       Defaults to port `6881` if value is not set.
     * `QBT_WEBUI_PORT` \
-      This environment variable sets the port number which qBittorrent WebUI will be binded to.
+      This environment variable defines the port number used for qBittorrent WebUI.
       Defaults to port `8080` if value is not set.
 
     #### Volumes
@@ -69,10 +70,10 @@ https://github.com/qbittorrent/qBittorrent/issues
     There are some paths involved:
     * `<your_path>/config` \
       Full path to a folder on your host machine which will store qBittorrent configurations.
-      Using relative path won't work.
+      Using a relative path will not work.
     * `<your_path>/downloads` \
       Full path to a folder on your host machine which will store the files downloaded by qBittorrent.
-      Using relative path won't work.
+      Using a relative path will not work.
 
 3. Running the image
 
@@ -118,7 +119,7 @@ https://github.com/qbittorrent/qBittorrent/issues
       * You can change the User ID (UID) and Group ID (GID) of the `qbittorrent-nox` process by setting
         environment variables `PUID` and `PGID` respectively. By default they are both set to `1000`. \
         Note that you will need to remove `--read-only` flag (when using Docker) or set
-        `read_only: false` (when using Docker Compose) as they are incompatible with it.
+        `read_only: false` (when using Docker Compose) as these settings are incompatible with each other.
       * You can set additional group ID (AGID) of the `qbittorrent-nox` process by setting the
         environment variable `PAGID`. For example: `10000,10001`, this will set the process to be in
         two (secondary) groups `10000` and `10001`. By default there is no additional group. \

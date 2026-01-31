@@ -6,7 +6,7 @@ on:
 permissions: {}
 
 env:
-  QBT_VERSION: "5.1.2"
+  QBT_VERSION: "5.1.4"
 
   # This is a positive integer number that allows to differentiate between consecutive builds of the same qBittorrent version.
   # When `QBT_VERSION` is incremented, this value must reset to 1.
@@ -15,7 +15,7 @@ env:
 jobs:
   build:
     name: Release - Build
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.targets.runs-on }}
     permissions:
       attestations: write
       id-token: write
@@ -23,17 +23,34 @@ jobs:
 
     strategy:
       matrix:
-        platform:
-          - "linux/386"
-          - "linux/amd64"
-          - "linux/arm/v6"
-          - "linux/arm/v7"
-          - "linux/arm64/v8"
-          - "linux/riscv64"
+        targets:
+          - platform: "linux/386"
+            runs-on: ubuntu-latest
+          - platform: "linux/amd64"
+            runs-on: ubuntu-latest
+          - platform: "linux/arm/v6"
+            runs-on: ubuntu-24.04-arm
+          - platform: "linux/arm/v7"
+            runs-on: ubuntu-24.04-arm
+          - platform: "linux/arm64/v8"
+            runs-on: ubuntu-24.04-arm
+          - platform: "linux/riscv64"
+            runs-on: ubuntu-24.04-arm
+        libtorrent:
+          - branch: "RC_1_2"
+            boost:
+              version_major: "1"
+              version_minor: "86"
+              version_patch: "0"
+          - branch: "RC_2_0"
+            boost:
+              version_major: "1"
+              version_minor: "90"
+              version_patch: "0"
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
 
@@ -41,13 +58,14 @@ jobs:
         id: set-variables
         run: |
           echo "DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_OUTPUT
-          echo "PLATFORM_NAME=${{ matrix.platform }}" | sed 's|/|-|g' >> $GITHUB_OUTPUT
+          echo "PLATFORM_NAME=${{ matrix.targets.platform }}" | sed 's|/|-|g' >> $GITHUB_OUTPUT
+          echo "RELEASE_BRANCH=${{ matrix.libtorrent.branch == 'RC_1_2' && 'latest' || 'lt2' }}" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-        if: (matrix.platform != 'linux/386') && (matrix.platform != 'linux/amd64')
+        if: matrix.targets.platform == 'linux/riscv64'
         with:
-          platforms: ${{ matrix.platform }}
+          platforms: ${{ matrix.targets.platform }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -61,6 +79,11 @@ jobs:
         with:
           build-args: |
             QBT_VERSION=${{ env.QBT_VERSION }}
+            BOOST_VERSION_MAJOR=${{ matrix.libtorrent.boost.version_major }}
+            BOOST_VERSION_MINOR=${{ matrix.libtorrent.boost.version_minor }}
+            BOOST_VERSION_PATCH=${{ matrix.libtorrent.boost.version_patch }}
+            LIBBT_VERSION=${{ matrix.libtorrent.branch }}
+            LIBBT_CMAKE_FLAGS=${{ matrix.libtorrent.branch == 'RC_1_2' && '' || '-Ddeprecated-functions=ON' }}
           labels: |
             org.opencontainers.image.authors=https://github.com/qbittorrent/qBittorrent/graphs/contributors
             org.opencontainers.image.base.name=docker.io/alpine:latest
@@ -68,25 +91,25 @@ jobs:
             org.opencontainers.image.documentation=https://github.com/qbittorrent/docker-qbittorrent-nox#qbittorrent-nox-docker-image-
             org.opencontainers.image.created=${{ steps.set-variables.outputs.DATE }}
             org.opencontainers.image.licenses=GPL-3.0+
-            org.opencontainers.image.ref.name=${{ env.QBT_VERSION }}-${{ env.TAG_RELEASE_NUMBER }}
+            org.opencontainers.image.ref.name=${{ env.QBT_VERSION }}${{ matrix.libtorrent.branch == 'RC_2_0' && '-lt2' || '' }}-${{ env.TAG_RELEASE_NUMBER }}
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.source=https://github.com/qbittorrent/docker-qbittorrent-nox
             org.opencontainers.image.title=qbittorrent-nox docker image
             org.opencontainers.image.url=https://github.com/qbittorrent/docker-qbittorrent-nox
             org.opencontainers.image.vendor=qBittorrent
-            org.opencontainers.image.version=${{ env.QBT_VERSION }}
+            org.opencontainers.image.version=${{ env.QBT_VERSION }}${{ matrix.libtorrent.branch == 'RC_2_0' && '-lt2' || '' }}-${{ env.TAG_RELEASE_NUMBER }}
           load: true
-          platforms: ${{ matrix.platform }}
+          platforms: ${{ matrix.targets.platform }}
           tags: |
-            qbittorrentofficial/qbittorrent-nox:latest-${{ steps.set-variables.outputs.PLATFORM_NAME }}
-            ghcr.io/qbittorrent/docker-qbittorrent-nox:latest-${{ steps.set-variables.outputs.PLATFORM_NAME }}
+            qbittorrentofficial/qbittorrent-nox:${{ steps.set-variables.outputs.RELEASE_BRANCH }}-${{ steps.set-variables.outputs.PLATFORM_NAME }}
+            ghcr.io/qbittorrent/docker-qbittorrent-nox:${{ steps.set-variables.outputs.RELEASE_BRANCH }}-${{ steps.set-variables.outputs.PLATFORM_NAME }}
 
       - name: Test run
         run: |
           docker run \
             --entrypoint "/usr/bin/qbittorrent-nox" \
-            --platform ${{ matrix.platform }} \
-            qbittorrentofficial/qbittorrent-nox:latest-${{ steps.set-variables.outputs.PLATFORM_NAME }} \
+            --platform ${{ matrix.targets.platform }} \
+            qbittorrentofficial/qbittorrent-nox:${{ steps.set-variables.outputs.RELEASE_BRANCH }}-${{ steps.set-variables.outputs.PLATFORM_NAME }} \
             --version
 
       # To run the image locally:
@@ -96,22 +119,22 @@ jobs:
       - name: Export image
         run: |
           docker tag \
-            qbittorrentofficial/qbittorrent-nox:latest-${{ steps.set-variables.outputs.PLATFORM_NAME }} \
-            qbittorrentofficial/qbittorrent-nox:${{ env.QBT_VERSION }}
+            qbittorrentofficial/qbittorrent-nox:${{ steps.set-variables.outputs.RELEASE_BRANCH }}-${{ steps.set-variables.outputs.PLATFORM_NAME }} \
+            qbittorrentofficial/qbittorrent-nox:${{ env.QBT_VERSION }}${{ matrix.libtorrent.branch == 'RC_2_0' && '-lt2' || '' }}
           docker save \
-            --output qbittorrent-nox_${{ env.QBT_VERSION }}_${{ steps.set-variables.outputs.PLATFORM_NAME }} \
-            qbittorrentofficial/qbittorrent-nox:${{ env.QBT_VERSION }}
+            --output qbittorrent-nox_${{ env.QBT_VERSION }}${{ matrix.libtorrent.branch == 'RC_2_0' && '_lt2' || '' }}-${{ env.TAG_RELEASE_NUMBER }}_${{ steps.set-variables.outputs.PLATFORM_NAME }} \
+            qbittorrentofficial/qbittorrent-nox:${{ env.QBT_VERSION }}${{ matrix.libtorrent.branch == 'RC_2_0' && '-lt2' || '' }}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
-          name: qbittorrent-nox_${{ env.QBT_VERSION }}_${{ steps.set-variables.outputs.PLATFORM_NAME }}
-          path: qbittorrent-nox_${{ env.QBT_VERSION }}_${{ steps.set-variables.outputs.PLATFORM_NAME }}
+          name: qbittorrent-nox_${{ env.QBT_VERSION }}${{ matrix.libtorrent.branch == 'RC_2_0' && '_lt2' || '' }}-${{ env.TAG_RELEASE_NUMBER }}_${{ steps.set-variables.outputs.PLATFORM_NAME }}
+          path: qbittorrent-nox_${{ env.QBT_VERSION }}${{ matrix.libtorrent.branch == 'RC_2_0' && '_lt2' || '' }}-${{ env.TAG_RELEASE_NUMBER }}_${{ steps.set-variables.outputs.PLATFORM_NAME }}
 
       - name: Generate build provenace attestations
         uses: actions/attest-build-provenance@v3
         with:
-          subject-path: qbittorrent-nox_${{ env.QBT_VERSION }}_${{ steps.set-variables.outputs.PLATFORM_NAME }}
+          subject-path: qbittorrent-nox_${{ env.QBT_VERSION }}${{ matrix.libtorrent.branch == 'RC_2_0' && '_lt2' || '' }}-${{ env.TAG_RELEASE_NUMBER }}_${{ steps.set-variables.outputs.PLATFORM_NAME }}
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -128,8 +151,8 @@ jobs:
 
       - name: Upload to registries
         run: |
-          docker push qbittorrentofficial/qbittorrent-nox:latest-${{ steps.set-variables.outputs.PLATFORM_NAME }}
-          docker push ghcr.io/qbittorrent/docker-qbittorrent-nox:latest-${{ steps.set-variables.outputs.PLATFORM_NAME }}
+          docker push qbittorrentofficial/qbittorrent-nox:${{ steps.set-variables.outputs.RELEASE_BRANCH }}-${{ steps.set-variables.outputs.PLATFORM_NAME }}
+          docker push ghcr.io/qbittorrent/docker-qbittorrent-nox:${{ steps.set-variables.outputs.RELEASE_BRANCH }}-${{ steps.set-variables.outputs.PLATFORM_NAME }}
 
 
   upload:
@@ -164,6 +187,14 @@ jobs:
             --amend qbittorrentofficial/qbittorrent-nox:latest-linux-arm64-v8 \
             --amend qbittorrentofficial/qbittorrent-nox:latest-linux-riscv64
           docker manifest create \
+            qbittorrentofficial/qbittorrent-nox:${{ env.QBT_VERSION }}-lt2-${{ env.TAG_RELEASE_NUMBER }} \
+            --amend qbittorrentofficial/qbittorrent-nox:lt2-linux-386 \
+            --amend qbittorrentofficial/qbittorrent-nox:lt2-linux-amd64 \
+            --amend qbittorrentofficial/qbittorrent-nox:lt2-linux-arm-v6 \
+            --amend qbittorrentofficial/qbittorrent-nox:lt2-linux-arm-v7 \
+            --amend qbittorrentofficial/qbittorrent-nox:lt2-linux-arm64-v8 \
+            --amend qbittorrentofficial/qbittorrent-nox:lt2-linux-riscv64
+          docker manifest create \
             qbittorrentofficial/qbittorrent-nox:latest \
             --amend qbittorrentofficial/qbittorrent-nox:latest-linux-386 \
             --amend qbittorrentofficial/qbittorrent-nox:latest-linux-amd64 \
@@ -180,6 +211,14 @@ jobs:
             --amend ghcr.io/qbittorrent/docker-qbittorrent-nox:latest-linux-arm64-v8 \
             --amend ghcr.io/qbittorrent/docker-qbittorrent-nox:latest-linux-riscv64
           docker manifest create \
+            ghcr.io/qbittorrent/docker-qbittorrent-nox:${{ env.QBT_VERSION }}-lt2-${{ env.TAG_RELEASE_NUMBER }} \
+            --amend ghcr.io/qbittorrent/docker-qbittorrent-nox:lt2-linux-386 \
+            --amend ghcr.io/qbittorrent/docker-qbittorrent-nox:lt2-linux-amd64 \
+            --amend ghcr.io/qbittorrent/docker-qbittorrent-nox:lt2-linux-arm-v6 \
+            --amend ghcr.io/qbittorrent/docker-qbittorrent-nox:lt2-linux-arm-v7 \
+            --amend ghcr.io/qbittorrent/docker-qbittorrent-nox:lt2-linux-arm64-v8 \
+            --amend ghcr.io/qbittorrent/docker-qbittorrent-nox:lt2-linux-riscv64
+          docker manifest create \
             ghcr.io/qbittorrent/docker-qbittorrent-nox:latest \
             --amend ghcr.io/qbittorrent/docker-qbittorrent-nox:latest-linux-386 \
             --amend ghcr.io/qbittorrent/docker-qbittorrent-nox:latest-linux-amd64 \
@@ -191,7 +230,9 @@ jobs:
       - name: Upload to registries
         run: |
           docker manifest push qbittorrentofficial/qbittorrent-nox:${{ env.QBT_VERSION }}-${{ env.TAG_RELEASE_NUMBER }}
+          docker manifest push qbittorrentofficial/qbittorrent-nox:${{ env.QBT_VERSION }}-lt2-${{ env.TAG_RELEASE_NUMBER }}
           docker manifest push qbittorrentofficial/qbittorrent-nox:latest
           docker manifest push ghcr.io/qbittorrent/docker-qbittorrent-nox:${{ env.QBT_VERSION }}-${{ env.TAG_RELEASE_NUMBER }}
+          docker manifest push ghcr.io/qbittorrent/docker-qbittorrent-nox:${{ env.QBT_VERSION }}-lt2-${{ env.TAG_RELEASE_NUMBER }}
           docker manifest push ghcr.io/qbittorrent/docker-qbittorrent-nox:latest
           echo "::notice Remember to remove latest-* tags from Docker Hub!"
