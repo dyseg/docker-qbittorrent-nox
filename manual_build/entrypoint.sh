@@ -86,6 +86,8 @@ fi
 if [ "$isRoot" = "1" ]; then
     exec \
         doas -u qbtUser \
+            ionice -c 2 -n 7 \
+            nice -n 19 \
             qbittorrent-nox \
                 "$argLegalNotice" \
                 --profile="$profilePath" \
@@ -94,6 +96,8 @@ if [ "$isRoot" = "1" ]; then
                 "$@"
 else
     exec \
+        ionice -c 2 -n 7 \
+        nice -n 19 \
         qbittorrent-nox \
             "$argLegalNotice" \
             --profile="$profilePath" \
