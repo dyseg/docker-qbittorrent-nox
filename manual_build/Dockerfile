@@ -27,7 +27,7 @@ ARG QBT_VERSION \
     BOOST_VERSION_MAJOR="1" \
     BOOST_VERSION_MINOR="90" \
     BOOST_VERSION_PATCH="0" \
-    LIBBT_VERSION="RC_2_0" \
+    LIBBT_VERSION="master" \
     LIBBT_CMAKE_FLAGS=""
 
 # check environment variables
