@@ -99,7 +99,7 @@ RUN \
       --depth 1 \
       --recurse-submodules \
       --branch webui-wip \
-      https://github.com/dyseg/qBittorrent.git && \
+      http://dysegnas:30000/dyseg/qBittorrent.git && \
     cd qBittorrent ; \
   else \
     wget "https://github.com/qbittorrent/qBittorrent/archive/refs/tags/release-${QBT_VERSION}.tar.gz" && \
