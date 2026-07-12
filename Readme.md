@@ -57,7 +57,7 @@ https://github.com/qbittorrent/qBittorrent/issues
       For example, `4.4.5-1` is a valid entry. You can find all tagged versions [here](https://hub.docker.com/r/qbittorrentofficial/qbittorrent-nox/tags). \
       You can put `latest` to use the latest stable release of qBittorrent. \
       If you are looking to test the bleeding-edge version, you can put `alpha` to get the weekly build. \
-      A `lt2` variation is available which uses libtorrent v2.x. However, users have reported memory/performance [issues](https://github.com/arvidn/libtorrent/issues/6667). Use at your own risk!
+      A `lt2` variation is available which uses libtorrent v2.0.x. However, users have reported memory/performance [issues](https://github.com/arvidn/libtorrent/issues/6667). Use at your own risk!
     * `QBT_TORRENTING_PORT` \
       This environment variable defines the port number used for torrenting traffic.
       Defaults to port `6881` if value is not set.
@@ -114,17 +114,24 @@ https://github.com/qbittorrent/qBittorrent/issues
         for the image path.
       * You can pass command-line arguments to `qbittorrent-nox` by appending them to the end of `docker run ...` command.
         If using Docker Compose, modify the `command:` array in docker-compose.yml.
+      * ⚠️ To ensure qbittorrent has enough time to shutdown properly, you must override the time to wait for the container to stop.
+        If unspecified, the default value is merely 10 seconds which is too short that it will interrupt the shutdown procedure and
+        led to corrupted files. Set `--stop-timeout 1800` (or `stop_grace_period: 30m` when using Docker Compose).
       * By default the timezone in the container uses the default of Alpine Linux (which is most likely `UTC`).
         You can set the environment variable `TZ` to your preferred value.
       * You can change the User ID (UID) and Group ID (GID) of the `qbittorrent-nox` process by setting
         environment variables `PUID` and `PGID` respectively. By default they are both set to `1000`. \
-        Note that you will need to remove `--read-only` flag (when using Docker) or set
+        Note that:
+        1. You will need to remove `--read-only` flag (when using Docker) or set
         `read_only: false` (when using Docker Compose) as these settings are incompatible with each other.
+        2. This setting has no effect when running the image in rootless mode.
       * You can set additional group ID (AGID) of the `qbittorrent-nox` process by setting the
         environment variable `PAGID`. For example: `10000,10001`, this will set the process to be in
         two (secondary) groups `10000` and `10001`. By default there is no additional group. \
-        Note that you will need to remove `--read-only` flag (when using Docker) or set
+        Note that:
+        1. You will need to remove `--read-only` flag (when using Docker) or set
         `read_only: false` (when using Docker Compose) as they are incompatible with it.
+        2. This setting has no effect when running the image in rootless mode.
       * It is possible to set the umask of the `qbittorrent-nox` process by setting the
         environment variable `UMASK`. By default it uses the default from Alpine Linux.
       * You can list the compile-time Software Bill of Materials (sbom) with the following command:
